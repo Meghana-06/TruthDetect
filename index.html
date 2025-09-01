@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TruthLens</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.1.1/",
+    "react": "https://aistudiocdn.com/react@^19.1.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.16.0"
+  }
+}
+</script>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    /* The background color will be set by the canvas script to match the theme */
+  }
+
+  #background-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
+
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-fade-in-up {
+    animation: fade-in-up 0.5s ease-out forwards;
+  }
+</style>
+</head>
+  <body>
+    <canvas id="background-canvas"></canvas>
+    <div id="root"></div>
+    <script type="module">
+      const canvas = document.getElementById('background-canvas');
+      const ctx = canvas.getContext('2d');
+
+      let width = canvas.width = window.innerWidth;
+      let height = canvas.height = window.innerHeight;
+      let particles = [];
+      const particleCount = Math.floor((width * height) / 25000);
+      const connectionDistance = Math.min(width, height) * 0.15;
+
+      const mouse = {
+          x: null,
+          y: null,
+          radius: 120
+      };
+
+      window.addEventListener('mousemove', (event) => {
+          mouse.x = event.x;
+          mouse.y = event.y;
+      });
+      window.addEventListener('mouseout', () => {
+          mouse.x = null;
+          mouse.y = null;
+      });
+
+      const colors = {
+          light: {
+              particle: 'rgba(0, 0, 0, 0.3)',
+              line: 'rgba(0, 0, 0, 0.08)',
+              bg: '#ffffff'
+          },
+          dark: {
+              particle: 'rgba(255, 255, 255, 0.3)',
+              line: 'rgba(255, 255, 255, 0.08)',
+              bg: '#000000'
+          }
+      };
+      let currentColors = colors.light;
+
+      class Particle {
+          constructor() {
+              this.x = Math.random() * width;
+              this.y = Math.random() * height;
+              this.vx = Math.random() * 0.4 - 0.2;
+              this.vy = Math.random() * 0.4 - 0.2;
+              this.radius = Math.random() * 1.5 + 1;
+          }
+
+          update() {
+              // Mouse interaction - repulsion
+              if (mouse.x != null && mouse.y != null) {
+                  let dx = mouse.x - this.x;
+                  let dy = mouse.y - this.y;
+                  let distance = Math.sqrt(dx * dx + dy * dy);
+                  if (distance < mouse.radius) {
+                      let forceDirectionX = dx / distance;
+                      let forceDirectionY = dy / distance;
+                      let maxDistance = mouse.radius;
+                      let force = (maxDistance - distance) / maxDistance;
+                      let directionX = forceDirectionX * force * 0.5;
+                      let directionY = forceDirectionY * force * 0.5;
+                      
+                      this.x -= directionX;
+                      this.y -= directionY;
+                  }
+              }
+              
+              this.x += this.vx;
+              this.y += this.vy;
+
+              if (this.x < 0 || this.x > width) this.vx *= -1;
+              if (this.y < 0 || this.y > height) this.vy *= -1;
+          }
+
+          draw() {
+              ctx.beginPath();
+              ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+              ctx.fillStyle = currentColors.particle;
+              ctx.fill();
+          }
+      }
+
+      function init() {
+          particles = [];
+          for (let i = 0; i < particleCount; i++) {
+              particles.push(new Particle());
+          }
+      }
+
+      function connectParticles() {
+          for (let i = 0; i < particles.length; i++) {
+              for (let j = i + 1; j < particles.length; j++) {
+                  const dx = particles[i].x - particles[j].x;
+                  const dy = particles[i].y - particles[j].y;
+                  const distance = Math.sqrt(dx * dx + dy * dy);
+
+                  if (distance < connectionDistance) {
+                      ctx.beginPath();
+                      ctx.moveTo(particles[i].x, particles[i].y);
+                      ctx.lineTo(particles[j].x, particles[j].y);
+                      ctx.strokeStyle = `rgba(${currentColors.line.slice(5, -1)}, ${1 - distance / connectionDistance})`;
+                      ctx.lineWidth = 0.5;
+                      ctx.stroke();
+                  }
+              }
+          }
+      }
+
+      function animate() {
+          ctx.clearRect(0, 0, width, height);
+          
+          particles.forEach(p => {
+              p.update();
+              p.draw();
+          });
+
+          connectParticles();
+          requestAnimationFrame(animate);
+      }
+      
+      function setColorsByTheme(isDark) {
+          currentColors = isDark ? colors.dark : colors.light;
+          document.body.style.backgroundColor = currentColors.bg;
+      }
+      
+      const observer = new MutationObserver((mutations) => {
+          mutations.forEach(mutation => {
+              if (mutation.attributeName === 'class') {
+                  const isDark = document.documentElement.classList.contains('dark');
+                  setColorsByTheme(isDark);
+              }
+          });
+      });
+      observer.observe(document.documentElement, { attributes: true });
+
+      window.addEventListener('resize', () => {
+          width = canvas.width = window.innerWidth;
+          height = canvas.height = window.innerHeight;
+          init();
+      });
+      
+      setColorsByTheme(document.documentElement.classList.contains('dark'));
+      init();
+      animate();
+    </script>
+  </body>
+</html>
