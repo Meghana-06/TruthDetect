@@ -10,6 +10,19 @@ interface Topic {
     score: number;
 }
 
+const SkeletonLoader = () => (
+    <ul className="space-y-4">
+        {[...Array(5)].map((_, index) => (
+            <li key={index} className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg animate-pulse">
+                <div className="flex items-center justify-between">
+                    <div className="w-3/4 h-5 bg-gray-300 dark:bg-gray-700 rounded"></div>
+                    <div className="w-1/6 h-5 bg-gray-300 dark:bg-gray-700 rounded"></div>
+                </div>
+            </li>
+        ))}
+    </ul>
+);
+
 const TrendingTopicsPage: React.FC<{ onNavigate: (page: Page) => void }> = ({ onNavigate }) => {
     const [topics, setTopics] = useState<Topic[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -37,13 +50,9 @@ const TrendingTopicsPage: React.FC<{ onNavigate: (page: Page) => void }> = ({ on
         fetchTopics();
     }, []);
 
-    const getRiskColor = (risk: string) => {
-        switch (risk.toLowerCase()) {
-            case 'high': return 'bg-red-500';
-            case 'medium': return 'bg-yellow-500';
-            case 'low': return 'bg-green-500';
-            default: return 'bg-gray-500';
-        }
+    const handleCreateTemplate = (topic: string) => {
+        sessionStorage.setItem('templateTopic', topic);
+        onNavigate('dashboard/templates');
     };
     
     const getRiskTextColor = (risk: string) => {
@@ -68,23 +77,27 @@ const TrendingTopicsPage: React.FC<{ onNavigate: (page: Page) => void }> = ({ on
             <div className="max-w-3xl mx-auto">
                  <DashboardCard title="Current Trends" icon={ICONS.trending}>
                      {isLoading ? (
-                         <div className="flex justify-center items-center h-48">
-                             <svg className="animate-spin h-8 w-8 text-black dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                         </div>
+                         <SkeletonLoader />
                      ) : error ? (
                          <p className="text-center text-red-500">{error}</p>
                      ) : (
                          <ul className="space-y-4">
                              {topics.map((item, index) => (
-                                 <li key={index} className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-between">
-                                     <div className="flex-grow pr-4">
+                                <li key={index} className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                                     <div className="flex-grow mb-3 sm:mb-0 sm:pr-4">
                                          <p className="font-semibold">{item.topic}</p>
-                                         <p className={`text-sm font-bold ${getRiskTextColor(item.risk)}`}>Risk: {item.risk}</p>
+                                         <div className="flex items-center mt-1">
+                                            <p className={`text-sm font-bold ${getRiskTextColor(item.risk)}`}>Risk: {item.risk}</p>
+                                            <span className="mx-2 text-gray-400">|</span>
+                                            <p className="text-sm font-medium">Credibility: {item.score}/100</p>
+                                         </div>
                                      </div>
-                                     <div className="flex-shrink-0 text-right">
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">Credibility</p>
-                                        <p className="font-bold text-lg">{item.score}/100</p>
-                                     </div>
+                                     <button 
+                                        onClick={() => handleCreateTemplate(item.topic)}
+                                        className="w-full sm:w-auto flex-shrink-0 bg-black text-white dark:bg-white dark:text-black font-bold py-2 px-4 rounded-md hover:bg-gray-800 dark:hover:bg-gray-200 text-sm transition-colors"
+                                    >
+                                        Create Template
+                                    </button>
                                  </li>
                              ))}
                          </ul>

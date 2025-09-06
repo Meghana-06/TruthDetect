@@ -10,7 +10,7 @@ interface Message {
 const Chatbot: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([
-        { text: "Hi! I'm the support assistant for CodeHustlers. How can I help you with the TruthLens app today?", sender: 'bot' }
+        { text: "Hi! I'm the support assistant for CodeHustlers. How can I help you with the CodeHustlers app today?", sender: 'bot' }
     ]);
     const [userInput, setUserInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);

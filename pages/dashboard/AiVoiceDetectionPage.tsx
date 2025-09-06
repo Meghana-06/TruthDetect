@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { analyzeCallForFraud } from '../../services/geminiService';
-import { CallFraudAnalysisResult, Page } from '../../types';
+import { analyzeVoiceForAI } from '../../services/geminiService';
+import { AiVoiceDetectionResult, Page } from '../../types';
 import DashboardCard from '../../components/DashboardCard';
 import { ICONS } from '../../constants';
 
-const CallFraudDetectionPage: React.FC<{ onNavigate: (page: Page) => void }> = ({ onNavigate }) => {
+const AiVoiceDetectionPage: React.FC<{ onNavigate: (page: Page) => void }> = ({ onNavigate }) => {
     const [audioFile, setAudioFile] = useState<File | null>(null);
     const [isLoading, setIsLoading] = useState(false);
-    const [result, setResult] = useState<CallFraudAnalysisResult | null>(null);
+    const [result, setResult] = useState<AiVoiceDetectionResult | null>(null);
     const [error, setError] = useState<string | null>(null);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,7 +43,7 @@ const CallFraudDetectionPage: React.FC<{ onNavigate: (page: Page) => void }> = (
 
         try {
             const base64Audio = await fileToBase64(audioFile);
-            const analysisResult = await analyzeCallForFraud(base64Audio, audioFile.type);
+            const analysisResult = await analyzeVoiceForAI(base64Audio, audioFile.type);
             setResult(analysisResult);
         } catch (err) {
             console.error(err);
@@ -53,46 +53,31 @@ const CallFraudDetectionPage: React.FC<{ onNavigate: (page: Page) => void }> = (
         }
     };
     
-    const ResultDisplay = ({ result }: { result: CallFraudAnalysisResult }) => {
-        const isFraud = result.fraudAssessment === 'Fraudulent Call';
+    const ResultDisplay = ({ result }: { result: AiVoiceDetectionResult }) => {
+        const isAI = result.classification === 'AI-Generated Voice';
+        const getConfidenceColor = (confidence: number) => {
+            if (confidence > 75) return 'bg-green-500';
+            if (confidence > 40) return 'bg-yellow-500';
+            return 'bg-red-500';
+        }
+
         return (
-            <div className="space-y-6">
-                <div className={`p-6 rounded-lg text-center ${isFraud ? 'bg-red-100/50 dark:bg-red-900/30 border border-red-300 dark:border-red-700' : 'bg-green-100/50 dark:bg-green-900/30 border border-green-300 dark:border-green-700'}`}>
-                    <h3 className={`text-2xl font-bold ${isFraud ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
-                        {result.fraudAssessment}
-                    </h3>
-                    <p className="font-semibold mt-1">Accuracy: {result.confidence}%</p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="p-4 bg-gray-100 dark:bg-gray-800/50 rounded-lg">
-                        <h4 className="font-bold mb-2">Voice Analysis</h4>
-                        <p>{result.classification}</p>
-                    </div>
-                     <div className="p-4 bg-gray-100 dark:bg-gray-800/50 rounded-lg">
-                        <h4 className="font-bold mb-2">Suspicious Keywords Found</h4>
-                        {result.keywordsFound.length > 0 ? (
-                            <div className="flex flex-wrap gap-2">
-                                {result.keywordsFound.map(word => <span key={word} className="bg-yellow-200 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-200 text-xs font-semibold px-2.5 py-1 rounded-full">{word}</span>)}
-                            </div>
-                        ) : <p>None</p>}
-                    </div>
-                </div>
-
+            <div className="space-y-4">
                 <div>
-                    <h4 className="font-bold mb-2">Explanation</h4>
+                    <h4 className="font-semibold text-lg">Classification</h4>
+                    <p className={`font-bold text-xl ${isAI ? 'text-orange-500' : 'text-blue-500'}`}>{result.classification}</p>
+                </div>
+                <div>
+                    <h4 className="font-semibold text-lg">Confidence</h4>
+                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4">
+                        <div className={`h-4 rounded-full ${getConfidenceColor(result.confidence)}`} style={{ width: `${result.confidence}%` }}></div>
+                    </div>
+                     <p className="text-right text-sm font-medium">{result.confidence}%</p>
+                </div>
+                <div>
+                    <h4 className="font-semibold text-lg">Explanation</h4>
                     <p className="text-sm text-gray-600 dark:text-gray-300 p-4 bg-gray-100 dark:bg-gray-800/50 rounded-lg">{result.explanation}</p>
                 </div>
-                
-                {isFraud && (
-                    <div className="mt-6 p-4 bg-red-100 dark:bg-red-900/50 rounded-lg border border-red-300 dark:border-red-700 text-center">
-                        <p className="font-semibold text-red-800 dark:text-red-200">If you suspect fraud, report it immediately:</p>
-                        <p className="mt-2 text-red-800 dark:text-red-200">Cybercrime Helpline: <strong className="text-xl">1930</strong></p>
-                        <a href="https://cybercrime.gov.in" target="_blank" rel="noopener noreferrer" className="mt-3 inline-block bg-black text-white dark:bg-white dark:text-black font-bold py-2 px-4 rounded-md hover:bg-gray-800 dark:hover:bg-gray-200 text-sm transition-colors">
-                            Report on Portal
-                        </a>
-                    </div>
-                )}
             </div>
         )
     };
@@ -102,13 +87,13 @@ const CallFraudDetectionPage: React.FC<{ onNavigate: (page: Page) => void }> = (
             <button onClick={() => onNavigate('dashboard')} className="text-sm font-medium text-black dark:text-white underline hover:opacity-80 mb-4">
                 &larr; Back to Dashboard
             </button>
-            <h1 className="text-3xl font-bold mb-2 text-center text-black dark:text-white">Call Fraud Detection</h1>
+            <h1 className="text-3xl font-bold mb-2 text-center text-black dark:text-white">AI Voice Detection</h1>
             <p className="text-center text-gray-500 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
-                Upload a recorded call (.mp3, .wav) to detect AI-generated voices and scan for keywords commonly used in scams.
+                Upload an audio file (.mp3, .wav) to determine if the voice is AI-generated or human with 90% accuracy.
             </p>
 
             <div className="max-w-2xl mx-auto">
-                <DashboardCard title="Audio Uploader" icon={ICONS.voice}>
+                <DashboardCard title="Audio Uploader" icon={ICONS.aivoice}>
                     <div className="flex flex-col items-center space-y-4">
                          <input
                             type="file"
@@ -141,10 +126,10 @@ const CallFraudDetectionPage: React.FC<{ onNavigate: (page: Page) => void }> = (
                             {isLoading ? (
                                 <>
                                     <svg className="animate-spin -ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                    Analyzing Call...
+                                    Analyzing Voice...
                                 </>
                             ) : (
-                                "Analyze for Fraud"
+                                "Detect AI Voice"
                             )}
                         </button>
                     </div>
@@ -162,4 +147,4 @@ const CallFraudDetectionPage: React.FC<{ onNavigate: (page: Page) => void }> = (
     );
 };
 
-export default CallFraudDetectionPage;
+export default AiVoiceDetectionPage;

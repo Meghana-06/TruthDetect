@@ -1,5 +1,5 @@
 {
-  "name": "TruthLens",
+  "name": "CodeHustlers",
   "description": "AI-powered tool to detect misinformation in articles, images, and trending searches. Empowering citizens with truth and awareness.",
   "requestFramePermissions": [
     "microphone"

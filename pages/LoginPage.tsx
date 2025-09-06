@@ -62,7 +62,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, onSwitchToRegister }) =>
     <div className="flex flex-col items-center justify-center text-center">
       <div className="max-w-4xl w-full bg-white/70 dark:bg-black/70 backdrop-blur-2xl rounded-2xl p-10 md:p-16 border border-gray-200 dark:border-gray-800 shadow-2xl">
         <h1 className="text-5xl md:text-7xl font-extrabold mb-4 text-black dark:text-white">
-          Welcome to <span className="text-black dark:text-white">TruthLens</span>
+          Welcome to <span className="text-black dark:text-white">CodeHustlers</span>
         </h1>
         <p className="text-lg md:text-xl text-black dark:text-gray-300 max-w-3xl mx-auto mb-8">
           Harness the power of advanced AI to navigate the complex digital landscape with confidence. Our tools provide real-time analysis of articles, images, and online trends to uncover misinformation, empowering you with the clarity to distinguish fact from fiction.

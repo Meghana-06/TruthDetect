@@ -23,10 +23,22 @@ const features: Feature[] = [
     path: 'dashboard/article',
   },
   {
-    title: 'AI Voice Detection',
+    title: 'SMS Fraud Detection',
+    icon: ICONS.sms,
+    description: 'Analyze SMS messages to detect potential fraud and phishing attempts.',
+    path: 'dashboard/sms',
+  },
+  {
+    title: 'Call Fraud Detection',
     icon: ICONS.voice,
-    description: 'Determine if an audio clip contains a human or AI-synthesized voice.',
+    description: 'Analyze recorded calls for AI voices and scam keywords to detect fraud.',
     path: 'dashboard/voice',
+  },
+  {
+    title: 'AI Voice Detection',
+    icon: ICONS.aivoice,
+    description: 'Determine if a voice recording is AI-generated or from a real person.',
+    path: 'dashboard/aivoice',
   },
   {
     title: 'Trending Searches',
@@ -74,7 +86,7 @@ const DashboardPage: React.FC<{ onNavigate: (page: Page) => void }> = ({ onNavig
                 Welcome to your command center for truth. Select a tool below to begin your analysis and contribute to a more informed digital world.
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                {features.map(feature => (
                    <ToolCard key={feature.path} feature={feature} onNavigate={onNavigate} />
                ))}

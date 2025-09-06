@@ -20,16 +20,22 @@ const features = [
         path: 'dashboard/article'
     },
     { 
+        icon: ICONS.sms,
+        title: "SMS Fraud Detection",
+        description: "Analyze SMS messages to detect potential fraud and phishing attempts based on sender ID.",
+        path: 'dashboard/sms'
+    },
+    { 
         icon: ICONS.voice,
-        title: "AI Voice Detection",
-        description: "Upload audio clips to determine if a voice is human or AI-synthesized, based on cadence and audio artifacts.",
+        title: "Call Fraud Detection",
+        description: "Analyze recorded calls for AI voices and scam keywords to detect fraud.",
         path: 'dashboard/voice'
     },
     { 
-        icon: ICONS.trending,
-        title: "Trending Searches",
-        description: "Stay informed with real-time analysis of trending online narratives to spot widespread misinformation.",
-        path: 'dashboard/trending'
+        icon: ICONS.aivoice,
+        title: "AI Voice Detection",
+        description: "Determine if a voice recording is AI-generated or a real person with high accuracy.",
+        path: 'dashboard/aivoice'
     },
     { 
         icon: ICONS.template,
@@ -62,7 +68,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
     <div className="flex flex-col items-center justify-center text-center">
       <div className="max-w-4xl w-full bg-white/70 dark:bg-black/70 backdrop-blur-2xl rounded-2xl p-10 md:p-16 border border-gray-200 dark:border-white/10 shadow-2xl mb-12">
         <h1 className="text-5xl md:text-7xl font-extrabold mb-4 text-gray-900 dark:text-white">
-          Welcome back to <span className="text-black dark:text-white">TruthLens</span>
+          Welcome back to <span className="text-black dark:text-white">CodeHustlers</span>
         </h1>
         <p className="text-lg md:text-xl text-black dark:text-gray-300 max-w-3xl mx-auto mb-8">
           Harness the power of advanced AI to navigate the complex digital landscape with confidence. Our tools provide real-time analysis of articles, images, and online trends to uncover misinformation, empowering you with the clarity to distinguish fact from fiction.

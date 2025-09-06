@@ -5,9 +5,11 @@ import { ICONS } from '../../constants';
 
 // Mock data for demonstration
 const mockHistory: UserHistoryItem[] = [
+    { id: '6', type: 'aivoice', query: 'ceo_speech_sample.wav', result: 'AI-Generated Voice (92%)', timestamp: '2024-07-28 16:00' },
     { id: '1', type: 'image', query: 'city_skyline.jpg', result: 'AI-generated (88%)', timestamp: '2024-07-28 14:30' },
     { id: '2', type: 'article', query: 'Article on miracle cures...', result: 'High Risk (95)', timestamp: '2024-07-28 11:15' },
-    { id: '3', type: 'voice', query: 'political_speech.mp3', result: 'Human Voice (92%)', timestamp: '2024-07-27 18:45' },
+    { id: '5', type: 'sms', query: '"Click here to claim prize..."', result: 'Fraud', timestamp: '2024-07-28 10:00' },
+    { id: '3', type: 'voice', query: 'unknown_caller.mp3', result: 'Fraudulent Call (94%)', timestamp: '2024-07-27 18:45' },
     { id: '4', type: 'image', query: 'family_photo.png', result: 'Authentic (98%)', timestamp: '2024-07-26 09:00' },
 ];
 
@@ -20,11 +22,13 @@ const achievements = [
 ];
 
 const HistoryItem: React.FC<{ item: UserHistoryItem }> = ({ item }) => {
-    const getIcon = (type: 'image' | 'article' | 'voice') => {
+    const getIcon = (type: 'image' | 'article' | 'voice' | 'sms' | 'aivoice') => {
         switch (type) {
             case 'image': return ICONS.image;
             case 'article': return ICONS.article;
             case 'voice': return ICONS.voice;
+            case 'sms': return ICONS.sms;
+            case 'aivoice': return ICONS.aivoice;
         }
     }
     return (

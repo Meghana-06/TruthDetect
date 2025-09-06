@@ -15,7 +15,9 @@ import { User } from './types';
 // Import new tool pages
 import ImageDetectionPage from './pages/dashboard/ImageDetectionPage';
 import ArticleAnalysisPage from './pages/dashboard/ArticleAnalysisPage';
-import VoiceDetectionPage from './pages/dashboard/VoiceDetectionPage';
+import CallFraudDetectionPage from './pages/dashboard/VoiceDetectionPage';
+import AiVoiceDetectionPage from './pages/dashboard/AiVoiceDetectionPage';
+import SmsFraudDetectionPage from './pages/dashboard/SmsFraudDetectionPage';
 import TrendingTopicsPage from './pages/dashboard/TrendingTopicsPage';
 import AwarenessTemplatesPage from './pages/dashboard/AwarenessTemplatesPage';
 import UserInsightsPage from './pages/dashboard/UserInsightsPage';
@@ -123,7 +125,9 @@ const App: React.FC = () => {
         switch (subpage) {
             case 'image': return <ImageDetectionPage onNavigate={handleNavigation} />;
             case 'article': return <ArticleAnalysisPage onNavigate={handleNavigation} />;
-            case 'voice': return <VoiceDetectionPage onNavigate={handleNavigation} />;
+            case 'voice': return <CallFraudDetectionPage onNavigate={handleNavigation} />;
+            case 'aivoice': return <AiVoiceDetectionPage onNavigate={handleNavigation} />;
+            case 'sms': return <SmsFraudDetectionPage onNavigate={handleNavigation} />;
             case 'trending': return <TrendingTopicsPage onNavigate={handleNavigation} />;
             case 'templates': return <AwarenessTemplatesPage onNavigate={handleNavigation} />;
             case 'insights': return <UserInsightsPage onNavigate={handleNavigation} />;
