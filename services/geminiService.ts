@@ -1,5 +1,5 @@
 import { GoogleGenAI, GenerateContentResponse, Type, Chat } from "@google/genai";
-import { CallFraudAnalysisResult, AiVoiceDetectionResult } from "../types";
+import { CallFraudAnalysisResult, AiVoiceDetectionResult, SmsAnalysisResult } from "../types";
 
 const API_KEY = process.env.API_KEY;
 
@@ -246,6 +246,46 @@ export const generateAwarenessTemplateText = async (prompt: string): Promise<any
     } catch (error) {
         console.error("Error generating template text:", error);
         return { title: 'Error', highlights: ['Could not generate content.'], tips: [] };
+    }
+};
+
+export const analyzeSmsForFraud = async (content: string, senderType: string): Promise<SmsAnalysisResult> => {
+    try {
+        const response: GenerateContentResponse = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: `Analyze the following SMS message for signs of fraud, considering its sender ID type.
+            Sender ID Type: "${senderType}"
+            Message: "${content}"
+            
+            Common fraud indicators include:
+            - Urgency (e.g., "act now", "limited time")
+            - Suspicious links (especially shortened URLs)
+            - Requests for personal information (passwords, OTPs, bank details)
+            - Unsolicited prize winnings or job offers
+            - Threats or warnings (e.g., "account will be suspended")
+            - Alphanumeric sender IDs for non-transactional messages.
+
+            Based on these indicators, determine if this is likely a fraudulent message.
+            Provide a classification ('safe' or 'fraud') and a brief, helpful explanation for the user.`,
+            config: {
+                responseMimeType: 'application/json',
+                responseSchema: {
+                    type: Type.OBJECT,
+                    properties: {
+                        classification: { type: Type.STRING },
+                        explanation: { type: Type.STRING }
+                    }
+                }
+            }
+        });
+        const result = cleanAndParseJson(response.text);
+        if (result.classification !== 'safe' && result.classification !== 'fraud') {
+            return { classification: 'safe', explanation: 'Received an unexpected classification. Defaulting to safe.' };
+        }
+        return result;
+    } catch (error) {
+        console.error("Error analyzing SMS:", error);
+        return { classification: 'safe', explanation: 'An error occurred during analysis.' };
     }
 };
 

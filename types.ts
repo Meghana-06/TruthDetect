@@ -28,6 +28,11 @@ export interface ArticleAnalysisResult {
   claims: { claim: string; verification: string }[];
 }
 
+export interface SmsAnalysisResult {
+  classification: 'safe' | 'fraud';
+  explanation: string;
+}
+
 export interface UserHistoryItem {
   id: string;
   type: 'image' | 'article' | 'voice' | 'sms' | 'aivoice';
